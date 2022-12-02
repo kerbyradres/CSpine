@@ -4,30 +4,31 @@
 "use strict";
 
 var buttons = {
-		l: ['c2','c3','c4','c5','c6','c7'],
-		m: ['m0','m1','m2','m3', 'm4'],
-		d: ['d0','d1','d2'],
-		n: ['n0','n1','n2','n3','n1c']
+		l: ['c0','c1','c2','c3','c4','c5','c6','c7'],
+		u: ['A','B','C'],
+		s: ['A0','A1','A2','A3','A4','B1','B2','B3','C','F1','F2','F3','BL'],
 	},
 	cspine = {
 		levels: buttons.l,
-		types: ['m','d','n'],
-		data: {c2:{},c3:{},c4:{},c5:{},c6:{},c7:{}}
-	},
+		types: ['u','s'],
+        data:{c0:{},c1:{},c2:{},c3:{},c4:{},c5:{},c6:{},c7:{}}},
 	text = {
-		m0: 'There is no morphologic abnormality of ~~~',
-		m1: 'There is a compression injury of ~~~',
-		m2: 'There is a burst fracture of ~~~',
-		m3: 'There is a distraction injury of ~~~',
-		m4: 'There is a translation/rotation injury of ~~~',
-		d0: 'The disco-ligamentous complex (DLC) at !!! is intact. ',
-		d1: 'The disco-ligamentous complex (DLC) at !!! is indeterminate. ',
-		d2: 'The disco-ligamentous complex (DLC) at !!! is disrupted. ',
-		n0: 'Normal neurologic function. ',
-		n1: 'Root injury. ',
-		n2: 'Complete cord injury. ',
-		n3: 'Incomplete cord injury. ',
-		n1c: 'Continuous cord compression. '
+		A: 'Occipital condyle and occipital cervical joint complex injury, Type A. Isolated bony injury of the occipital condyle, without significant ligamentous injury at ~~~',
+		B: 'Occipital condyle and occipital cervical joint complex injury, Type B. Ligamentous injury without complete separation of anatomic integrity at ~~~',
+		C: 'Occipital condyle and occipital cervical joint complex injury, Type C. Translation injury with separation of anatomic integrity at ~~~',
+		A0: 'There is a distraction injury of ~~~',
+		A1: 'There is a translation/rotation injury of ~~~',
+		A2: 'The disco-ligamentous complex (DLC) at !!! is intact. ',
+		A3: 'The disco-ligamentous complex (DLC) at !!! is indeterminate. ',
+		A4: 'The disco-ligamentous complex (DLC) at !!! is disrupted. ',
+		B1: 'Normal neurologic function. ',
+		B2: 'Root injury. ',
+		B3: 'Complete cord injury. ',
+		C: 'Incomplete cord injury. ',
+		F1: 'Continuous cord compression. ',
+        F2: 'Continuous cord compression. ',
+        F3: 'Continuous cord compression. ',
+        BL: 'Continuous cord compression. ',
 	},
 	hints = {};
 
@@ -38,41 +39,25 @@ $(document).ready(function() {
 cspine.update = function() {
 	var i = 0, j;
 	// regenerate report
-	cspine.report = {c2: '',c3: '',c4: '',c5: '',c6: '',c7: ''};
+  cspine.report = {c0: '',c1: '',c2: '',c3: '',c4: '',c5: '',c6: '',c7: ''};
 
 	// quit if no level is selected
 	if (!$('#divLevel button.active').attr('id')) return false;
-
-	// show CCC if a neuro status is chosen
-	if ($('#divNeuro button').hasClass('active')) {
-		$('#divCCC').fadeIn('slow');
-	} else {
-		$('#divCCC').fadeOut('slow');
-		$('#n1c').removeClass('active');
-	}
 
 	// save data for current level
 	cspine.getData();
 
 	// for each level
 	for (i = 0; i < cspine.levels.length; i++) {
-		var	morph = cspine.data[cspine.levels[i]].m,
-			DLC = cspine.data[cspine.levels[i]].d,
-			neuro = cspine.data[cspine.levels[i]].n,
-			ccc = cspine.data[cspine.levels[i]].c;
+		var	Upper = cspine.data[cspine.levels[i]].u,
+			Subaxial = cspine.data[cspine.levels[i]].s,;
 
 		// add a sentence for each selection
 		cspine.report[cspine.levels[i]] =
-			(text[cspine.data[cspine.levels[i]].m] || '') +
-			(text[cspine.data[cspine.levels[i]].d] || '') +
-			(text[cspine.data[cspine.levels[i]].n] || '') +
-			(text[cspine.data[cspine.levels[i]].c] || '');
+			(text[cspine.data[cspine.levels[i]].u] || '') +
+			(text[cspine.data[cspine.levels[i]].s] || '');
 
-		// add SLIC score if all 3 pathologies are inputted
-		if (morph && DLC && neuro) {
-			cspine.report[cspine.levels[i]] +=
-				'The SLIC score is ' +
-				(~~morph[1] + ~~DLC[1] + ~~neuro[1] + ~~ccc[1]) + '.';
+		
 		}
 	}
 
@@ -86,10 +71,8 @@ cspine.getData = function() {
 
 	if (!level) return false;
 
-	cspine.data[level].m = $('#divMorph button.active').attr('id') || '';
-	cspine.data[level].d = $('#divDLC button.active').attr('id') || '';
-	cspine.data[level].n = $('#divNeuro button.active').attr('id') || '';
-	cspine.data[level].c = $('#divCCC button.active').attr('id') || '';
+	cspine.data[level].u = $('#divUpper button.active').attr('id') || '';
+	cspine.data[level].s = $('#divSubaxial button.active').attr('id') || '';
 };
 
 // turn the report data into words
@@ -202,9 +185,9 @@ $('#btnSelectAll').click(function() {
 });
 
 cspine.reset = function() {
-	cspine.data = {c2:{},c3:{},c4:{},c5:{},c6:{},c7:{}};
+	cspine.data = {c0:{},c1:{},c2:{},c3:{},c4:{},c5:{},c6:{},c7:{}};
 	$('button').removeClass('active levelPos curLevel').blur();
-	$('#c2').addClass('curLevel active');
+	$('#c0').addClass('curLevel active');
 	cspine.update();
 };
 
@@ -283,7 +266,7 @@ cspine.initHints = function() {
 			content: 'Ongoing cord compression in the setting of neurologic deficit'
 		}
 	};
-	buttons.p = buttons.m.concat(buttons.d, buttons.n);
+	buttons.p = buttons.u.concat(buttons.s);
 
 	$('button[type="radio"]').popover({
 		container: 'body',
@@ -299,9 +282,8 @@ cspine.initHints = function() {
 	}
 };
 
-// initialization - preselect C2-3
+// initialization - preselect C0
 cspine.reset();
 cspine.initHints();
-
-
 });
+
